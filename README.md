@@ -27,4 +27,4 @@ So, it's good for things like:
  - redis
 
 ----------
-if you have questions about my code, i am pleasure to help
+if you have questions about my code, leave me an issue, i am willing to help
