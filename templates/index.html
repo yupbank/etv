@@ -1,0 +1,27 @@
+<head>
+<script type="text/javascript" src="../static/jquery-1.7.2.min.js"></script>
+</head>
+<h1> demos: </h1>
+<h2> heatmap demo : <a href="./demo/heatmap"> here </a></h2>
+<h2> eye location demo : <a href="./demo/multi"> here </a></h2>
+<h2> parallax demo: <a href="./demo/paralla"> here </a></h2>
+<h1> this is the data receiving:</h1>
+<div id="log"> </div>
+<script type="text/javascript" chatset="utf-8">
+$(document).ready(function()
+{
+        if("WebSocket" in window){
+            var ws = new WebSocket("ws://"+window.location.host+"/realtime/");
+            ws.onopen = function(){};
+            ws.onmessage = function(evt){
+                var received_msg = evt.data;
+                var htm = $("#log").html();
+                htm = "<p>"+ received_msg+"</p>"+ htm;
+                $("#log").html(htm);
+            };
+            ws.onclose = function(){};
+        }else{
+            alert("Web socket no support");
+            }
+    });
+</script>

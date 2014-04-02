@@ -1,0 +1,152 @@
+<html>
+    <head>
+        <script type="text/javascript" src="../static/jquery-1.7.2.min.js"></script>
+        <script src="../static/d3.v3.min.js" charset="utf-8"></script>
+		<style>
+			body, html {
+				margin:0;
+				padding:0;
+				font-family:Arial;
+			}
+			h1 {
+				margin-bottom:10px;
+			}
+			#main {
+				position:relative;
+				width:940px;
+				padding:20px;
+				margin:auto;
+			}
+			#heatmapArea {
+				position:absolute;
+				float:left;
+				width:1440px;
+				height:900px;
+                border:1px dashed black;
+                z-index: 50;
+			}
+			#configArea {
+				position:relative;
+				float:left;
+				width:260px;
+				padding:20px;
+			}
+			#gen {
+				margin-top:25px;
+				padding:10px 20px 10px 20px;
+				-moz-border-radius:15px;
+				-o-border-radius:15px;
+				-webkit-border-radius:15px;
+				border-radius:15px;
+				border:2px solid black;
+				cursor:pointer;
+				color:white;
+				background-color:black;
+			}
+			#gen:hover{
+				background-color:grey;
+				color:black;
+            }
+            .node {
+                stroke: #fff;
+                stroke-width: 1.5px;
+            }
+            .link {
+                stroke: #999;
+                stroke-opacity: .6;
+            }
+             circle {
+                  fill: #aaa;
+                    stroke: #666;
+                      stroke-width: 1.5px;
+                  }
+		</style>
+		<script type="text/javascript" src="../static/heatmap.js"></script>
+</head>
+        <svg id="heatmapArea">
+            <h1> This is demo</h1>
+            <br>
+            <h2> enjoy:</h2>
+            <img src="../static/lzl.jpg"  style="width: 50%; height: 50%"/>
+        </svg>
+		<script type="text/javascript">
+	
+var xx = h337.create({"element":document.getElementById("heatmapArea"), "radius":25, "visible":true});
+var svg = d3.select("#heatmapArea");
+var sample_data = [
+                {"name": "left", "cx": 50, "cy": 90, 'color': 'red'},
+                {"name": "right", "cx":590, "cy": 90, 'color': 'blue'},
+                {"name": "middle", "cx":130, "cy":90, 'color': 'green'},
+                ];
+var links = [
+                {"source":1,"target":0,"value":1},
+                {"source":2,"target":0,"value":8},
+                ];
+svg.selectAll('circle')
+.data(sample_data)
+    .enter()
+    .append('circle')
+    .attr('cx', function(d){return d.cx;})
+    .attr('cy', function(d){return d.cy;})
+    .style('fill', function(d){return d.color})
+    .attr('r', 10)
+    .attr('name', function(d){return d.name})
+    .attr('text', function(d){return d.name});
+
+
+var left = d3.select('[name=left]');
+var right = d3.select('[name=right]');
+var middle = d3.select('[name=middle]');
+var line_one = svg.append("line")
+.style("stroke", "black")
+.attr("x1", left.attr('cx'))
+.attr("y1", left.attr('cy'))
+.attr("x2", middle.attr('cx'))
+.attr("y2", middle.attr('cy'));
+var line_two = svg.append("line")
+.style("stroke", "black")
+.attr("x1", right.attr('cx'))
+.attr("y1", right.attr('cy'))
+.attr("x2", middle.attr('cx'))
+.attr("y2", middle.attr('cy'));
+
+
+$(document).ready(function()
+{
+        if("WebSocket" in window){
+            var ws = new WebSocket("ws://"+window.location.host+"/realtime/");
+            ws.onopen = function(){};
+            ws.onmessage = function(evt){
+            console.info(evt.data);
+            var obj = JSON.parse(evt.data);
+            try{
+
+            left.attr('cx', obj.left.x).attr('cy', obj.left.y);
+            line_one.attr('x1', obj.left.x).attr('y1', obj.left.y);
+            right.attr('cx', obj.right.x).attr('cy', obj.right.y);
+            line_two.attr('x1', obj.right.x).attr('y1', obj.right.y);
+            middle.attr('cx', obj.x).attr('cy', obj.y);
+            line_one.attr('x2', obj.x).attr('y2', obj.y);
+            line_two.attr('x2', obj.x).attr('y2', obj.y);
+            
+            //left.transition().duration(750).attr('cx', obj.left.x).attr('cy', obj.left.y);
+            //line_one.transition().duration(750).attr('x1', obj.left.x).attr('y1', obj.left.y);
+            //right.transition().duration(750).attr('cx', obj.right.x).attr('cy', obj.right.y);
+            //line_two.transition().duration(750).attr('x1', obj.right.x).attr('y1', obj.right.y);
+            //middle.transition().duration(750).attr('cx', obj.x).attr('cy', obj.y);
+            //line_one.transition().duration(750).attr('x2', obj.x).attr('y2', obj.y);
+            //line_two.transition().duration(750).attr('x2', obj.x).attr('y2', obj.y);
+            
+            }catch (e){
+                console.info(obj.x+'||'+obj.y+e); 
+            }
+            };
+            ws.onclose = function(){};
+        }else{
+            alert("Web socket no support");
+            }
+	
+		});
+		
+    </script>
+</html>

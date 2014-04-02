@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8">
+
+    <title>Parallax.js | Simple Example</title>
+
+    <!-- Behavioral Meta Data -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <!-- Styles -->
+    <link rel="stylesheet" type="text/css" href="../static/styles.css"/>
+
+</head>
+<body>
+
+    <div id="container" class="container">
+        <ul id="scene" class="scene">
+            <li class="layer" data-depth="1.00"><img src="../static/layer1.png"></li>
+            <li class="layer" data-depth="0.80"><img src="../static/layer2.png"></li>
+            <li class="layer" data-depth="0.60"><img src="../static/layer3.png"></li>
+            <li class="layer" data-depth="0.40"><img src="../static/layer4.png"></li>
+            <li class="layer" data-depth="0.20"><img src="../static/layer5.png"></li>
+            <li class="layer" data-depth="0.00"><img src="../static/layer6.png"></li>
+        </ul>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../static/parallax.js"></script>
+    <script>
+
+    // Pretty simple huh?
+    var scene = document.getElementById('scene');
+    var parallax = new Parallax(scene);
+
+    </script>
+
+</body>
+</html>
+

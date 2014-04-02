@@ -1,0 +1,84 @@
+<html>
+    <head>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<style>
+			body, html {
+				margin:0;
+				padding:0;
+				font-family:Arial;
+			}
+			h1 {
+				margin-bottom:10px;
+			}
+			#main {
+				position:relative;
+				width:940px;
+				padding:20px;
+				margin:auto;
+			}
+			#heatmapArea {
+				position:relative;
+				float:left;
+				width:1440px;
+				height:900px;
+                border:1px dashed black;
+			}
+			#configArea {
+				position:relative;
+				float:left;
+				width:260px;
+				padding:20px;
+			}
+			#gen {
+				margin-top:25px;
+				padding:10px 20px 10px 20px;
+				-moz-border-radius:15px;
+				-o-border-radius:15px;
+				-webkit-border-radius:15px;
+				border-radius:15px;
+				border:2px solid black;
+				cursor:pointer;
+				color:white;
+				background-color:black;
+			}
+			#gen:hover{
+				background-color:grey;
+				color:black;
+			}
+		</style>
+		<script type="text/javascript" src="../static/heatmap.js"></script>
+</head>
+        <div id="heatmapArea">
+            <h1> This is template one</h1>
+            <br>
+            <a href="/demo/2"> go to template two </a>
+            <h2> enjoy:</h2>
+            <img src="../static/lzl.jpg"  style="width: 50%; height: 50%"/>
+        </div>
+		<script type="text/javascript">
+	
+var xx = h337.create({"element":document.getElementById("heatmapArea"), "radius":25, "visible":true});
+
+$(document).ready(function()
+{
+        if("WebSocket" in window){
+            var ws = new WebSocket("ws://"+window.location.host+"/realtime/");
+            ws.onopen = function(){};
+            ws.onmessage = function(evt){
+            console.info(evt.data);
+            var obj = JSON.parse(evt.data);
+            try{
+            xx.store.addDataPoint(obj.x, obj.y);
+            }catch (e){
+                console.info(obj.x+'||'+obj.y); 
+            }
+            };
+            ws.onclose = function(){};
+        }else{
+            alert("Web socket no support");
+            }
+	
+		});
+		
+    </script>
+</html>
