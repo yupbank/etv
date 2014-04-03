@@ -60,6 +60,7 @@
                     stroke: #666;
                       stroke-width: 1.5px;
                   }
+      body{ background: url("../static/lzl.jpg") no-repeat}
 		</style>
 		<script type="text/javascript" src="../static/heatmap.js"></script>
 </head>
@@ -67,10 +68,9 @@
             <h1> This is demo</h1>
             <br>
             <h2> enjoy:</h2>
-            <img src="../static/lzl.jpg"  style="width: 50%; height: 50%"/>
         </svg>
 		<script type="text/javascript">
-	
+
 var xx = h337.create({"element":document.getElementById("heatmapArea"), "radius":25, "visible":true});
 var svg = d3.select("#heatmapArea");
 var sample_data = [
@@ -128,7 +128,7 @@ $(document).ready(function()
             middle.attr('cx', obj.x).attr('cy', obj.y);
             line_one.attr('x2', obj.x).attr('y2', obj.y);
             line_two.attr('x2', obj.x).attr('y2', obj.y);
-            
+
             //left.transition().duration(750).attr('cx', obj.left.x).attr('cy', obj.left.y);
             //line_one.transition().duration(750).attr('x1', obj.left.x).attr('y1', obj.left.y);
             //right.transition().duration(750).attr('cx', obj.right.x).attr('cy', obj.right.y);
@@ -136,17 +136,17 @@ $(document).ready(function()
             //middle.transition().duration(750).attr('cx', obj.x).attr('cy', obj.y);
             //line_one.transition().duration(750).attr('x2', obj.x).attr('y2', obj.y);
             //line_two.transition().duration(750).attr('x2', obj.x).attr('y2', obj.y);
-            
+
             }catch (e){
-                console.info(obj.x+'||'+obj.y+e); 
+                console.info(obj.x+'||'+obj.y+e);
             }
             };
             ws.onclose = function(){};
         }else{
             alert("Web socket no support");
             }
-	
+
 		});
-		
+
     </script>
 </html>
