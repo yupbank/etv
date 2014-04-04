@@ -75,11 +75,6 @@
   <script type="text/javascript">
   var xx = h337.create({"element":document.getElementById("heatmapArea"), "radius":25, "visible":true});
   var svg = d3.select("#heatmapArea");
-  var sample_data = [
-                  {"name": "left", "cx": 50, "cy": 90, 'color': 'red'},
-                  {"name": "right", "cx":590, "cy": 90, 'color': 'blue'},
-                  {"name": "middle", "cx":130, "cy":90, 'color': 'green'},
-                  ];
 
   var Graph = {
       getD3Object: function(){return d3.select('[name=' + this.name +']');}
