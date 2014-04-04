@@ -82,53 +82,67 @@ var links = [
                 {"source":1,"target":0,"value":1},
                 {"source":2,"target":0,"value":8},
                 ];
-svg.selectAll('circle')
-.data(sample_data)
-    .enter()
-    .append('circle')
-    .attr('cx', function(d){return d.cx;})
-    .attr('cy', function(d){return d.cy;})
-    .style('fill', function(d){return d.color})
-    .attr('r', 10)
-    .attr('name', function(d){return d.name})
-    .attr('text', function(d){return d.name});
 
+function Point(name, color){
+  this.positon = {cx: null, cy: null}
+  this.name = name
+  this.color = color
+  this.update_position = function(cx,cy){
+    this.positon.cx = cx
+    this.positon.cy = cy
+  }
+  this.get_d3_object = function(){
+    return this.d3.select('[name=' + this.name +']');
+  }
+}
 
-var left = d3.select('[name=left]');
-var right = d3.select('[name=right]');
-var middle = d3.select('[name=middle]');
-var line_one = svg.append("line")
-.style("stroke", "black")
-.attr("x1", left.attr('cx'))
-.attr("y1", left.attr('cy'))
-.attr("x2", middle.attr('cx'))
-.attr("y2", middle.attr('cy'));
-var line_two = svg.append("line")
-.style("stroke", "black")
-.attr("x1", right.attr('cx'))
-.attr("y1", right.attr('cy'))
-.attr("x2", middle.attr('cx'))
-.attr("y2", middle.attr('cy'));
+function Line(point1, point2){
+  this.point1 = point1
+  this.point2 = point2
+}
 
+var renderPoints = function(data){
+    svg.selectAll('circle')
+       .data(data)
+       .enter()
+       .append('circle')
+       .attr('cx', function(d){return d.positon.cx;})
+       .attr('cy', function(d){return d.positon.cy;})
+       .style('fill', function(d){return d.color})
+       .attr('r', 10)
+       .attr('name', function(d){return d.name})
+       .attr('text', function(d){return d.name});
+}
+
+var renderLines = function(data){
+    svg.selectAll('line')
+       .data(data)
+       .enter()
+       .append('line')
+       .style("stroke", "black")
+       .attr("x1", function(d){return d.point1.positon.cx})
+       .attr("y1", function(d){return d.point1.positon.cy})
+       .attr("x2", function(d){return d.point2.positon.cx})
+       .attr("y2", function(d){return d.point2.positon.cy})
+}
+
+var point1 = new Point("left","red")
+var point2 = new Point("middle","green")
+var point3 = new Point("right","blue")
+
+var line1 = new Line(point1, point2)
+var line2 = new Line(point2, point3)
 
 $(document).ready(function()
 {
         if("WebSocket" in window){
             var ws = new WebSocket("ws://"+window.location.host+"/realtime/");
-            ws.onopen = function(){};
+            ws.onopen = function(){
+            };
             ws.onmessage = function(evt){
             console.info(evt.data);
             var obj = JSON.parse(evt.data);
             try{
-
-            left.attr('cx', obj.left.x).attr('cy', obj.left.y);
-            line_one.attr('x1', obj.left.x).attr('y1', obj.left.y);
-            right.attr('cx', obj.right.x).attr('cy', obj.right.y);
-            line_two.attr('x1', obj.right.x).attr('y1', obj.right.y);
-            middle.attr('cx', obj.x).attr('cy', obj.y);
-            line_one.attr('x2', obj.x).attr('y2', obj.y);
-            line_two.attr('x2', obj.x).attr('y2', obj.y);
-
             //left.transition().duration(750).attr('cx', obj.left.x).attr('cy', obj.left.y);
             //line_one.transition().duration(750).attr('x1', obj.left.x).attr('y1', obj.left.y);
             //right.transition().duration(750).attr('cx', obj.right.x).attr('cy', obj.right.y);
