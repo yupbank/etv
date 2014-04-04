@@ -78,60 +78,78 @@ var sample_data = [
                 {"name": "right", "cx":590, "cy": 90, 'color': 'blue'},
                 {"name": "middle", "cx":130, "cy":90, 'color': 'green'},
                 ];
-var links = [
-                {"source":1,"target":0,"value":1},
-                {"source":2,"target":0,"value":8},
-                ];
 
 function Point(name, color){
-  this.positon = {cx: null, cy: null}
-  this.name = name
-  this.color = color
+  this.position = {cx: 0, cy: 0}
+  this.name = name;
+  this.color = color;
+  this.getD3Object = function(){
+    return d3.select('[name=' + this.name +']');
+  };
   this.update_position = function(cx,cy){
-    this.positon.cx = cx
-    this.positon.cy = cy
-  }
-  this.get_d3_object = function(){
-    return this.d3.select('[name=' + this.name +']');
+    this.position.cx = cx
+    this.position.cy = cy
+    this.getD3Object().attr('cx', cx).attr('cy', cy)
   }
 }
 
-function Line(point1, point2){
+function Line(name, point1, point2){
+  this.name = name
   this.point1 = point1
   this.point2 = point2
+  this.getD3Object = function(){
+    return d3.select('[name=' + this.name +']');
+  };
+  this.update_position = function(){
+    var point1 = this.point1
+    var point2 = this.point2
+
+    this.getD3Object()
+        .attr("x1", point1.position.cx)
+        .attr("x2", point2.position.cx)
+        .attr("y1", point1.position.cy)
+        .attr("y2", point2.position.cy)
+    };
+
 }
 
-var renderPoints = function(data){
+var renderPoints = function(points){
+    var data = points
     svg.selectAll('circle')
        .data(data)
        .enter()
        .append('circle')
-       .attr('cx', function(d){return d.positon.cx;})
-       .attr('cy', function(d){return d.positon.cy;})
+       .attr('cx', function(d){return d.position.cx;})
+       .attr('cy', function(d){return d.position.cy;})
        .style('fill', function(d){return d.color})
        .attr('r', 10)
        .attr('name', function(d){return d.name})
        .attr('text', function(d){return d.name});
 }
 
-var renderLines = function(data){
+var renderLines = function(lines){
+    var data = lines
     svg.selectAll('line')
        .data(data)
        .enter()
        .append('line')
        .style("stroke", "black")
-       .attr("x1", function(d){return d.point1.positon.cx})
-       .attr("y1", function(d){return d.point1.positon.cy})
-       .attr("x2", function(d){return d.point2.positon.cx})
-       .attr("y2", function(d){return d.point2.positon.cy})
+       .attr('name', function(d){return d.name})
+       .attr("x1", function(d){return d.point1.position.cx})
+       .attr("y1", function(d){return d.point1.position.cy})
+       .attr("x2", function(d){return d.point2.position.cx})
+       .attr("y2", function(d){return d.point2.position.cy})
 }
 
 var point1 = new Point("left","red")
 var point2 = new Point("middle","green")
 var point3 = new Point("right","blue")
 
-var line1 = new Line(point1, point2)
-var line2 = new Line(point2, point3)
+var line1 = new Line("line1", point1, point2)
+var line2 = new Line("line2", point2, point3)
+
+renderPoints([point1, point2, point3])
+renderLines([line1, line2])
 
 $(document).ready(function()
 {
@@ -140,16 +158,15 @@ $(document).ready(function()
             ws.onopen = function(){
             };
             ws.onmessage = function(evt){
-            console.info(evt.data);
-            var obj = JSON.parse(evt.data);
             try{
-            //left.transition().duration(750).attr('cx', obj.left.x).attr('cy', obj.left.y);
-            //line_one.transition().duration(750).attr('x1', obj.left.x).attr('y1', obj.left.y);
-            //right.transition().duration(750).attr('cx', obj.right.x).attr('cy', obj.right.y);
-            //line_two.transition().duration(750).attr('x1', obj.right.x).attr('y1', obj.right.y);
-            //middle.transition().duration(750).attr('cx', obj.x).attr('cy', obj.y);
-            //line_one.transition().duration(750).attr('x2', obj.x).attr('y2', obj.y);
-            //line_two.transition().duration(750).attr('x2', obj.x).attr('y2', obj.y);
+              console.info(evt.data);
+              var new_positions = JSON.parse(evt.data);
+              point1.update_position(new_positions.left.x, new_positions.left.y)
+              point2.update_position(new_positions.x, new_positions.y)
+              point3.update_position(new_positions.right.x, new_positions.right.y)
+
+              line1.update_position()
+              line2.update_position()
 
             }catch (e){
                 console.info(obj.x+'||'+obj.y+e);
