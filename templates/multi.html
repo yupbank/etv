@@ -2,74 +2,78 @@
     <head>
         <script type="text/javascript" src="../static/jquery-1.7.2.min.js"></script>
         <script src="../static/d3.v3.min.js" charset="utf-8"></script>
-		<style>
-			body, html {
-				margin:0;
-				padding:0;
-				font-family:Arial;
-			}
-			h1 {
-				margin-bottom:10px;
-			}
-			#main {
-				position:relative;
-				width:940px;
-				padding:20px;
-				margin:auto;
-			}
-			#heatmapArea {
-				position:absolute;
-				float:left;
-				width:1440px;
-				height:900px;
-                border:1px dashed black;
-                z-index: 50;
-			}
-			#configArea {
-				position:relative;
-				float:left;
-				width:260px;
-				padding:20px;
-			}
-			#gen {
-				margin-top:25px;
-				padding:10px 20px 10px 20px;
-				-moz-border-radius:15px;
-				-o-border-radius:15px;
-				-webkit-border-radius:15px;
-				border-radius:15px;
-				border:2px solid black;
-				cursor:pointer;
-				color:white;
-				background-color:black;
-			}
-			#gen:hover{
-				background-color:grey;
-				color:black;
-            }
-            .node {
-                stroke: #fff;
-                stroke-width: 1.5px;
-            }
-            .link {
-                stroke: #999;
-                stroke-opacity: .6;
-            }
-             circle {
-                  fill: #aaa;
-                    stroke: #666;
-                      stroke-width: 1.5px;
-                  }
-      body{ background: url("../static/lzl.jpg") no-repeat}
-		</style>
-		<script type="text/javascript" src="../static/heatmap.js"></script>
-</head>
+        <style>
+          body, html {
+            margin:0;
+            padding:0;
+            font-family:Arial;
+          }
+          h1 {
+            margin-bottom:10px;
+          }
+          #main {
+            position:relative;
+            width:940px;
+            padding:20px;
+            margin:auto;
+          }
+          #heatmapArea {
+            position:absolute;
+            float:left;
+            width:1440px;
+            height:900px;
+                    border:1px dashed black;
+                    z-index: 50;
+          }
+          #configArea {
+            position:relative;
+            float:left;
+            width:260px;
+            padding:20px;
+          }
+          #gen {
+            margin-top:25px;
+            padding:10px 20px 10px 20px;
+            -moz-border-radius:15px;
+            -o-border-radius:15px;
+            -webkit-border-radius:15px;
+            border-radius:15px;
+            border:2px solid black;
+            cursor:pointer;
+            color:white;
+            background-color:black;
+          }
+          #gen:hover{
+            background-color:grey;
+            color:black;
+                }
+                .node {
+                    stroke: #fff;
+                    stroke-width: 1.5px;
+                }
+                .link {
+                    stroke: #999;
+                    stroke-opacity: .6;
+                }
+                 circle {
+                      fill: #aaa;
+                        stroke: #666;
+                          stroke-width: 1.5px;
+                      }
+          body{ background: url("../static/lzl.jpg") no-repeat}
+        </style>
+        <script type="text/javascript" src="../static/heatmap.js"></script>
+    </head>
+    <body>
         <svg id="heatmapArea">
             <h1> This is demo</h1>
             <br>
             <h2> enjoy:</h2>
         </svg>
-		<script type="text/javascript">
+    </body>
+</html>
+
+<script type="text/javascript">
 
 var xx = h337.create({"element":document.getElementById("heatmapArea"), "radius":25, "visible":true});
 var svg = d3.select("#heatmapArea");
@@ -141,43 +145,39 @@ var renderLines = function(lines){
        .attr("y2", function(d){return d.point2.position.cy})
 }
 
-var point1 = new Point("left","red")
-var point2 = new Point("middle","green")
-var point3 = new Point("right","blue")
 
-var line1 = new Line("line1", point1, point2)
-var line2 = new Line("line2", point2, point3)
+$(document).ready(function(){
+  var point1 = new Point("left","red")
+  var point2 = new Point("middle","green")
+  var point3 = new Point("right","blue")
 
-renderPoints([point1, point2, point3])
-renderLines([line1, line2])
+  var line1 = new Line("line1", point1, point2)
+  var line2 = new Line("line2", point2, point3)
 
-$(document).ready(function()
-{
-        if("WebSocket" in window){
-            var ws = new WebSocket("ws://"+window.location.host+"/realtime/");
-            ws.onopen = function(){
-            };
-            ws.onmessage = function(evt){
-            try{
-              console.info(evt.data);
-              var new_positions = JSON.parse(evt.data);
-              point1.update_position(new_positions.left.x, new_positions.left.y)
-              point2.update_position(new_positions.x, new_positions.y)
-              point3.update_position(new_positions.right.x, new_positions.right.y)
+  renderPoints([point1, point2, point3])
+  renderLines([line1, line2])
 
-              line1.update_position()
-              line2.update_position()
+  if("WebSocket" in window){
+    var ws = new WebSocket("ws://"+window.location.host+"/realtime/");
+    ws.onopen = function(){};
+    ws.onmessage = function(evt){
+      try{
+        console.info(evt.data);
+        var new_positions = JSON.parse(evt.data);
+        point1.update_position(new_positions.left.x, new_positions.left.y)
+        point2.update_position(new_positions.x, new_positions.y)
+        point3.update_position(new_positions.right.x, new_positions.right.y)
 
-            }catch (e){
-                console.info(obj.x+'||'+obj.y+e);
-            }
-            };
-            ws.onclose = function(){};
-        }else{
-            alert("Web socket no support");
-            }
+        line1.update_position()
+        line2.update_position()
+      }catch (e){
+        console.info(obj.x+'||'+obj.y+e);
+      }
+    };
+    ws.onclose = function(){};
+  }else{
+    alert("Web socket no support");
+  }
+});
 
-		});
-
-    </script>
-</html>
+</script>
