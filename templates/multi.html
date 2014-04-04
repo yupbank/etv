@@ -22,8 +22,8 @@
             float:left;
             width:1440px;
             height:900px;
-                    border:1px dashed black;
-                    z-index: 50;
+            border:1px dashed black;
+            z-index: 50;
           }
           #configArea {
             position:relative;
@@ -55,11 +55,11 @@
                     stroke: #999;
                     stroke-opacity: .6;
                 }
-                 circle {
-                      fill: #aaa;
-                        stroke: #666;
-                          stroke-width: 1.5px;
-                      }
+                circle {
+                    fill: #aaa;
+                    stroke: #666;
+                    stroke-width: 1.5px;
+                }
           body{ background: url("../static/lzl.jpg") no-repeat}
         </style>
         <script type="text/javascript" src="../static/heatmap.js"></script>
@@ -71,113 +71,107 @@
             <h2> enjoy:</h2>
         </svg>
     </body>
+
+  <script type="text/javascript">
+  var xx = h337.create({"element":document.getElementById("heatmapArea"), "radius":25, "visible":true});
+  var svg = d3.select("#heatmapArea");
+  var sample_data = [
+                  {"name": "left", "cx": 50, "cy": 90, 'color': 'red'},
+                  {"name": "right", "cx":590, "cy": 90, 'color': 'blue'},
+                  {"name": "middle", "cx":130, "cy":90, 'color': 'green'},
+                  ];
+
+  var Graph = {
+      getD3Object: function(){return d3.select('[name=' + this.name +']');}
+  }
+
+  function Point(name, color){
+    this.position = {cx: 0, cy: 0}
+    this.name = name;
+    this.color = color;
+    this.update_position = function(cx,cy){
+      this.position.cx = cx
+      this.position.cy = cy
+      this.getD3Object().attr('cx', cx).attr('cy', cy)
+    }
+  }
+
+  function Line(name, point1, point2){
+    this.name = name
+    this.point1 = point1
+    this.point2 = point2
+    this.update_position = function(){
+      var point1 = this.point1
+      var point2 = this.point2
+
+      this.getD3Object()
+          .attr("x1", point1.position.cx)
+          .attr("x2", point2.position.cx)
+          .attr("y1", point1.position.cy)
+          .attr("y2", point2.position.cy)
+      };
+  }
+
+  Point.prototype = Graph
+  Line.prototype = Graph
+
+  var renderPoints = function(points){
+      svg.selectAll('circle')
+         .data(points)
+         .enter()
+         .append('circle')
+         .attr('cx', function(d){return d.position.cx;})
+         .attr('cy', function(d){return d.position.cy;})
+         .style('fill', function(d){return d.color})
+         .attr('r', 10)
+         .attr('name', function(d){return d.name})
+  }
+
+  var renderLines = function(lines){
+      svg.selectAll('line')
+         .data(lines)
+         .enter()
+         .append('line')
+         .style("stroke", "black")
+         .attr('name', function(d){return d.name})
+         .attr("x1", function(d){return d.point1.position.cx})
+         .attr("y1", function(d){return d.point1.position.cy})
+         .attr("x2", function(d){return d.point2.position.cx})
+         .attr("y2", function(d){return d.point2.position.cy})
+  }
+
+  $(document).ready(function(){
+    var point1 = new Point("left","red")
+    var point2 = new Point("middle","green")
+    var point3 = new Point("right","blue")
+
+    var line1 = new Line("line1", point1, point2)
+    var line2 = new Line("line2", point2, point3)
+
+    renderPoints([point1, point2, point3])
+    renderLines([line1, line2])
+
+    if("WebSocket" in window){
+      var ws = new WebSocket("ws://"+window.location.host+"/realtime/");
+      ws.onopen = function(){};
+      ws.onmessage = function(evt){
+        try{
+          console.info(evt.data);
+          var new_positions = JSON.parse(evt.data);
+          point1.update_position(new_positions.left.x, new_positions.left.y)
+          point2.update_position(new_positions.x, new_positions.y)
+          point3.update_position(new_positions.right.x, new_positions.right.y)
+
+          line1.update_position()
+          line2.update_position()
+        }catch (e){
+          console.info(e);
+        }
+      };
+      ws.onclose = function(){};
+    }else{
+      alert("Web socket no support");
+    }
+  });
+  </script>
 </html>
-
-<script type="text/javascript">
-
-var xx = h337.create({"element":document.getElementById("heatmapArea"), "radius":25, "visible":true});
-var svg = d3.select("#heatmapArea");
-var sample_data = [
-                {"name": "left", "cx": 50, "cy": 90, 'color': 'red'},
-                {"name": "right", "cx":590, "cy": 90, 'color': 'blue'},
-                {"name": "middle", "cx":130, "cy":90, 'color': 'green'},
-                ];
-
-function Point(name, color){
-  this.position = {cx: 0, cy: 0}
-  this.name = name;
-  this.color = color;
-  this.getD3Object = function(){
-    return d3.select('[name=' + this.name +']');
-  };
-  this.update_position = function(cx,cy){
-    this.position.cx = cx
-    this.position.cy = cy
-    this.getD3Object().attr('cx', cx).attr('cy', cy)
-  }
-}
-
-function Line(name, point1, point2){
-  this.name = name
-  this.point1 = point1
-  this.point2 = point2
-  this.getD3Object = function(){
-    return d3.select('[name=' + this.name +']');
-  };
-  this.update_position = function(){
-    var point1 = this.point1
-    var point2 = this.point2
-
-    this.getD3Object()
-        .attr("x1", point1.position.cx)
-        .attr("x2", point2.position.cx)
-        .attr("y1", point1.position.cy)
-        .attr("y2", point2.position.cy)
-    };
-
-}
-
-var renderPoints = function(points){
-    var data = points
-    svg.selectAll('circle')
-       .data(data)
-       .enter()
-       .append('circle')
-       .attr('cx', function(d){return d.position.cx;})
-       .attr('cy', function(d){return d.position.cy;})
-       .style('fill', function(d){return d.color})
-       .attr('r', 10)
-       .attr('name', function(d){return d.name})
-       .attr('text', function(d){return d.name});
-}
-
-var renderLines = function(lines){
-    var data = lines
-    svg.selectAll('line')
-       .data(data)
-       .enter()
-       .append('line')
-       .style("stroke", "black")
-       .attr('name', function(d){return d.name})
-       .attr("x1", function(d){return d.point1.position.cx})
-       .attr("y1", function(d){return d.point1.position.cy})
-       .attr("x2", function(d){return d.point2.position.cx})
-       .attr("y2", function(d){return d.point2.position.cy})
-}
-
-
-$(document).ready(function(){
-  var point1 = new Point("left","red")
-  var point2 = new Point("middle","green")
-  var point3 = new Point("right","blue")
-
-  var line1 = new Line("line1", point1, point2)
-  var line2 = new Line("line2", point2, point3)
-
-  renderPoints([point1, point2, point3])
-  renderLines([line1, line2])
-
-  if("WebSocket" in window){
-    var ws = new WebSocket("ws://"+window.location.host+"/realtime/");
-    ws.onopen = function(){};
-    ws.onmessage = function(evt){
-      try{
-        console.info(evt.data);
-        var new_positions = JSON.parse(evt.data);
-        point1.update_position(new_positions.left.x, new_positions.left.y)
-        point2.update_position(new_positions.x, new_positions.y)
-        point3.update_position(new_positions.right.x, new_positions.right.y)
-
-        line1.update_position()
-        line2.update_position()
-      }catch (e){
-        console.info(obj.x+'||'+obj.y+e);
-      }
-    };
-    ws.onclose = function(){};
-  }else{
-    alert("Web socket no support");
-  }
-});
-
-</script>
